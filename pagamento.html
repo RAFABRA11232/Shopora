@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pagamento - TrendNova</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 2rem; }
+    h1 { text-align: center; color: #1e88e5; }
+    .resumo { max-width: 600px; margin: 2rem auto; background: white; padding: 2rem; border-radius: 5px; box-shadow: 0 0 5px #ccc; }
+    .resumo ul { list-style: none; padding: 0; }
+    .resumo li { margin-bottom: 0.5rem; }
+    .total { font-weight: bold; margin-top: 1rem; }
+    button { background: #1e88e5; color: white; border: none; padding: 1rem; width: 100%; font-size: 1.1rem; cursor: pointer; border-radius: 5px; margin-top: 2rem; }
+    button:hover { background: #1565c0; }
+  </style>
+</head>
+<body>
+
+  <h1>Finalizar Pagamento</h1>
+
+  <div class="resumo">
+    <h2>Resumo da Compra</h2>
+    <ul id="lista-produtos"></ul>
+    <p class="total">Total: R$ <span id="valor-total">0.00</span></p>
+    <button onclick="pagar()">Pagar com Mercado Pago</button>
+  </div>
+
+  <script>
+    const carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
+    const lista = document.getElementById("lista-produtos");
+    const totalSpan = document.getElementById("valor-total");
+
+    let total = 0;
+    carrinho.forEach(item => {
+      const li = document.createElement("li");
+      const subtotal = item.preco * item.quantidade;
+      li.textContent = `${item.nome} x ${item.quantidade} = R$ ${subtotal.toFixed(2)}`;
+      lista.appendChild(li);
+      total += subtotal;
+    });
+
+    totalSpan.textContent = total.toFixed(2);
+
+    function pagar() {
+      alert("Redirecionando para o pagamento com Mercado Pago...");
+      // Aqui você pode redirecionar para um link real do Mercado Pago
+      window.location.href = "https://www.mercadopago.com.br/";
+    }
+  </script>
+
+</body>
+</html>
