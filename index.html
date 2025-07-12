@@ -17,5 +17,117 @@
     .produto p { color: #555; font-size: 0.9rem; }
     button { background: #1e88e5; color: white; border: none; padding: 0.7rem 1rem; cursor: pointer; border-radius: 4px; font-size: 1rem; }
     button:hover { background: #1565c0; }
-    #carrinho { position: fixed; top: 1rem; right: 1rem; background: white; padding: 1rem; border-radius: 5px; box-shadow: 0 0 10px #999; wid
+    #carrinho { position: fixed; top: 1rem; right: 1rem; background: white; padding: 1rem; border-radius: 5px; box-shadow: 0 0 10px #999; width: 300px; max-height: 80vh; overflow-y: auto; display: none; }
+    #carrinho h3 { margin-top: 0; }
+    #carrinho-lista { list-style: none; padding: 0; margin: 0 0 1rem 0; }
+    #carrinho-lista li { margin-bottom: 0.5rem; }
+    #mostrar-carrinho { position: fixed; top: 1rem; right: 320px; background: #1e88e5; color: white; border: none; padding: 0.7rem 1rem; cursor: pointer; border-radius: 4px; }
+  </style>
+</head>
+<body>
 
+<header>
+  <h1>TrendNova - Loja Online</h1>
+</header>
+
+<div class="container">
+  <div class="produtos" id="produtos"></div>
+</div>
+
+<button id="mostrar-carrinho">Carrinho 🛒</button>
+
+<div id="carrinho">
+  <h3>Seu Carrinho</h3>
+  <ul id="carrinho-lista"></ul>
+  <p>Total: R$ <span id="total">0.00</span></p>
+  <button onclick="irParaPagamento()">Finalizar Compra</button>
+  <button id="fechar-carrinho">Fechar</button>
+</div>
+
+<script>
+const produtos = [
+  { id: 1, nome: "Camisa Estilosa", preco: 79.90, img: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80" },
+  { id: 2, nome: "Tênis Confortável", preco: 199.90, img: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=600&q=80" },
+  { id: 3, nome: "Relógio Moderno", preco: 349.90, img: "https://images.unsplash.com/photo-1519744792095-2f2205e87b6f?auto=format&fit=crop&w=600&q=80" },
+  { id: 4, nome: "Bolsa de Couro", preco: 259.90, img: "https://images.unsplash.com/photo-1585386959984-a4155224a8d4?auto=format&fit=crop&w=600&q=80" },
+  { id: 5, nome: "Óculos de Sol", preco: 129.90, img: "https://images.unsplash.com/photo-1585386957326-04e35cf2c5f3?auto=format&fit=crop&w=600&q=80" },
+  { id: 6, nome: "Fone Bluetooth", preco: 99.90, img: "https://images.unsplash.com/photo-1573497019414-197f69d8187b?auto=format&fit=crop&w=600&q=80" }
+];
+
+let carrinho = [];
+
+const produtosDiv = document.getElementById("produtos");
+
+function mostrarProdutos() {
+  produtosDiv.innerHTML = "";
+  produtos.forEach(prod => {
+    const div = document.createElement("div");
+    div.className = "produto";
+    div.innerHTML = `
+      <img src="${prod.img}" alt="${prod.nome}" />
+      <h2>${prod.nome}</h2>
+      <p>R$ ${prod.preco.toFixed(2)}</p>
+      <button onclick="adicionarAoCarrinho(${prod.id})">Comprar</button>
+    `;
+    produtosDiv.appendChild(div);
+  });
+}
+
+function adicionarAoCarrinho(id) {
+  const produto = produtos.find(p => p.id === id);
+  if (!produto) return;
+  const itemNoCarrinho = carrinho.find(i => i.id === id);
+  if (itemNoCarrinho) {
+    itemNoCarrinho.quantidade++;
+  } else {
+    carrinho.push({ ...produto, quantidade: 1 });
+  }
+  alert(`"${produto.nome}" adicionado ao carrinho.`);
+  atualizarCarrinho();
+}
+
+const carrinhoDiv = document.getElementById("carrinho");
+const carrinhoLista = document.getElementById("carrinho-lista");
+const totalSpan = document.getElementById("total");
+const mostrarCarrinhoBtn = document.getElementById("mostrar-carrinho");
+const fecharCarrinhoBtn = document.getElementById("fechar-carrinho");
+
+function atualizarCarrinho() {
+  carrinhoDiv.style.display = carrinho.length > 0 ? "block" : "none";
+  carrinhoLista.innerHTML = "";
+  let total = 0;
+  carrinho.forEach(item => {
+    total += item.preco * item.quantidade;
+    const li = document.createElement("li");
+    li.textContent = `${item.nome} x ${item.quantidade} = R$ ${(item.preco * item.quantidade).toFixed(2)}`;
+    carrinhoLista.appendChild(li);
+  });
+  totalSpan.textContent = total.toFixed(2);
+}
+
+mostrarCarrinhoBtn.onclick = () => {
+  if (carrinho.length === 0) {
+    alert("Seu carrinho está vazio.");
+  } else {
+    carrinhoDiv.style.display = "block";
+  }
+};
+
+fecharCarrinhoBtn.onclick = () => {
+  carrinhoDiv.style.display = "none";
+};
+
+function irParaPagamento() {
+  if (carrinho.length === 0) {
+    alert("Adicione produtos ao carrinho antes de finalizar.");
+    return;
+  }
+  localStorage.setItem("carrinho", JSON.stringify(carrinho));
+  window.location.href = "pagamento.html";
+}
+
+mostrarProdutos();
+</script>
+
+</body>
+</html>
