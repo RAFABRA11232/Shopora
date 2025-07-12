@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Minha Loja Online</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; padding: 0; background:#f4f4f4; }
+  header { background: #1e88e5; color: white; padding: 1rem; text-align: center; }
+  h1 { margin: 0; }
+  .container { max-width: 900px; margin: 1rem auto; padding: 0 1rem; }
+  .produtos { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; }
+  .produto { background: white; border-radius: 5px; padding: 1rem; width: 260px; box-shadow: 0 0 5px #ccc; }
+  .produto img { width: 100%; border-radius: 5px; }
+  .produto h2 { font-size: 1.2rem; margin: 0.5rem 0; }
+  .produto p { color: #555; font-size: 0.9rem; }
+  button { background: #1e88e5; color: white; border: none; padding: 0.7rem 1rem; cursor: pointer; border-radius: 4px; font-size: 1rem; }
+  button:hover { background: #1565c0; }
+  #carrinho { position: fixed; top: 1rem; right: 1rem; background: white; padding: 1rem; border-radius: 5px; box-shadow: 0 0 10px #999; width: 300px; max-height: 80vh; overflow-y: auto; display: none; }
+  #carrinho h3 { margin-top: 0; }
+  #carrinho-lista { list-style: none; padding: 0; margin: 0 0 1rem 0; }
+  #carrinho-lista li { margin-bottom: 0.5rem; }
+  #mostrar-carrinho { position: fixed; top: 1rem; right: 320px; background: #1e88e5; color: white; border: none; padding: 0.7rem 1rem; cursor: pointer; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Minha Loja Online</h1>
+</header>
+
+<div class="container">
+  <div class="produtos" id="produtos"></div>
+</div>
+
+<button id="mostrar-carrinho">Carrinho 🛒</button>
+
+<div id="carrinho">
+  <h3>Seu Carrinho</h3>
+  <ul id="carrinho-lista"></ul>
+  <p>Total: R$ <span id="total">0.00</span></p>
+  <button id="finalizar">Finalizar Compra</button>
+  <button id="fechar-carrinho">Fechar</button>
+</div>
+
+<script>
+// Produtos básicos (você pode editar esses dados)
+const produtos = [
+  {
+    id: 1,
+    nome: "Camisa Estilosa",
+    preco: 79.90,
+    img: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    id: 2,
+    nome: "Tênis Confortável",
+    preco: 199.90,
+    img: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    id: 3,
+    nome: "Relógio Moderno",
+    preco: 349.90,
+    img: "https://images.unsplash.com/photo-1519744792095-2f2205e87b6f?auto=format&fit=crop&w=600&q=80"
+  }
+];
+
+// Estado do carrinho
+let carrinho = [];
+
+// Mostrar produtos na página
+const produtosDiv = document.getElementById("produtos");
+
+function mostrarProdutos() {
+  produtosDiv.innerHTML = "";
+  produtos.forEach(prod => {
+    const div = document.createElement("div");
+    div.className = "produto";
+    div.innerHTML = `
+      <img src="${prod.img}" alt="${prod.nome}" />
+      <h2>${prod.nome}</h2>
+      <p>R$ ${prod.preco.toFixed(2)}</p>
+      <button onclick="adicionarAoCarrinho(${prod.id})">Comprar</button>
+    `;
+    produtosDiv.appendChild(div);
+  });
+}
+
+// Adicionar ao carrinho
+function adicionarAoCarrinho(id) {
+  const produto = produtos.find(p => p.id === id);
+  if (!produto) return;
+  const itemNoCarrinho = carrinho.find(i => i.id === id);
+  if (itemNoCarrinho) {
+    itemNoCarrinho.quantidade++;
+  } else {
+    carrinho.push({ ...produto, quantidade: 1 });
+  }
+  alert(`"${produto.nome}" adicionado ao carrinho.`);
+  atualizarCarrinho();
+}
+
+// Atualizar visual do carrinho
+const carrinhoDiv = document.getElementById("carrinho");
+const carrinhoLista = document.getElementById("carrinho-lista");
+const totalSpan = document.getElementById("total");
+const mostrarCarrinhoBtn = document.getElementById("mostrar-carrinho");
+const fecharCarrinhoBtn = document.getElementById("fechar-carrinho");
+const finalizarBtn = document.getElementById("finalizar");
+
+function atualizarCarrinho() {
+  if (carrinho.length === 0) {
+    carrinhoDiv.style.display = "none";
+    return;
+  }
+  carrinhoDiv.style.display = "block";
+  carrinhoLista.innerHTML = "";
+  let total = 0;
+  carrinho.forEach(item => {
+    total += item.preco * item.quantidade;
+    const li = document.createElement("li");
+    li.textContent = `${item.nome} x ${item.quantidade} = R$ ${(
+      item.preco * item.quantidade
+    ).toFixed(2)}`;
+    carrinhoLista.appendChild(li);
+  });
+  totalSpan.textContent = total.toFixed(2);
+}
+
+mostrarCarrinhoBtn.onclick = () => {
+  if (carrinho.length === 0) {
+    alert("Seu carrinho está vazio.");
+  } else {
+    carrinhoDiv.style.display = "block";
+  }
+};
+
+fecharCarrinhoBtn.onclick = () => {
+  carrinhoDiv.style.display = "none";
+};
+
+// Integrar com Mercado Pago (cria checkout simplificado)
+finalizarBtn.onclick = () => {
+  if (carrinho.length === 0) {
+    alert("Adicione produtos ao carrinho antes de finalizar.");
+    return;
+  }
+  // Criar preferência de pagamento Mercado Pago via API (não tem backend aqui)
+  // Mas podemos usar checkout simplificado com link (exemplo simulado)
+
+  let descricao = "";
+  let valorTotal = 0;
+  carrinho.forEach(item => {
+    descricao += `${item.nome} x${item.quantidade} | `;
+    valorTotal += item.preco * item.quantidade;
+  });
+
+  valorTotal = valorTotal.toFixed(2);
+
+  // Link fictício para simular (você deve criar preferência real via API)
+  const mpLink = `https://mpago.la/2kVyTxu`; // Exemplo público Mercado Pago
+
+  alert(
+    `Resumo da compra: ${descricao} \nValor total: R$ ${valorTotal}\nVocê será redirecionado para pagar.`
+  );
+  window.open(mpLink, "_blank");
+};
+
+mostrarProdutos();
+atualizarCarrinho();
+</script>
+
+</body>
+</html>
